@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Items>
+	
+	<Item
+		id="artisan_beer"
+		name="Artisan Beer"
+		mesh="bd_barrel_a"
+		item_category="beer"
+		IsFood="false"
+		value="200"
+		weight="10"
+		Type="Goods">
+		<ItemComponent>
+			<Trade
+				morale_bonus="2" />
+		</ItemComponent>
+		<Flags
+			Civilian="true" />
+	</Item>
+	
+</Items>
