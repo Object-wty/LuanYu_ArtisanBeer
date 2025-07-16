@@ -1,4 +1,5 @@
-﻿using TaleWorlds.Core;
+﻿using TaleWorlds.CampaignSystem;
+using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
 
 
@@ -30,7 +31,14 @@ namespace LuanYu_ArtisanBeer
 
         }
 
-        
+        protected override void InitializeGameStarter(Game game, IGameStarter starterObject)
+        {
+            base.InitializeGameStarter(game, starterObject);
+            if(starterObject is CampaignGameStarter campaignGameStarter)
+            {
+                campaignGameStarter.AddBehavior(new ArtisanBeerCampaignBehavior());
+            }
+        }
 
     }
 }
