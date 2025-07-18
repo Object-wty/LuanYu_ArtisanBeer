@@ -20,6 +20,8 @@ namespace LuanYu_ArtisanBeer
 {
     internal class ArtisanBeerCampaignBehavior : CampaignBehaviorBase
     {
+        private CharacterObject _artisanBbrewer;
+        private ItemObject _artisanBeerObject;
 
         public override void RegisterEvents()
         {
@@ -30,19 +32,21 @@ namespace LuanYu_ArtisanBeer
 
         private void OnSessionLaunched(CampaignGameStarter starter)
         {
+            _artisanBbrewer = MBObjectManager.Instance.GetObject<CharacterObject>("artisan_brewer");
+            _artisanBeerObject = MBObjectManager.Instance.GetObject<ItemObject>("artisan_beer");
             this.AddArtisanWokerDialogs(starter);
         }
 
         private void AddArtisanWokerDialogs(CampaignGameStarter campaignGameStarter)
         {
             campaignGameStarter.AddDialogLine("artisanbeer_owner_begin", "start", "artisanbeer_npc_player", "嘿，朋友！想来点特别的吗？我们这有上等的精酿啤酒，200第纳尔一杯。要尝尝吗？", 
-            ()=> CharacterObject.OneToOneConversationCharacter == PlayerEncounter.LocationEncounter.Settlement.Culture.CaravanMaster, null, 100, null);
+            ()=> CharacterObject.OneToOneConversationCharacter == _artisanBbrewer, null, 100, null);
             campaignGameStarter.AddPlayerLine("artisanbeer_buy_one", "artisanbeer_npc_player", "artisanbeer_player_buy", "当然，给我来一杯", null, 
             () =>
             {
                 TaleWorlds.CampaignSystem.Roster.ItemRoster itemRoster = MobileParty.MainParty.ItemRoster;
-                ItemObject artisanBeerObject = MBObjectManager.Instance.GetObject<ItemObject>("artisan_beer");
-                itemRoster.AddToCounts(artisanBeerObject, 1);
+                
+                itemRoster.AddToCounts(_artisanBeerObject, 1);
                 Hero.MainHero.ChangeHeroGold(-200);
                 
             }
@@ -77,7 +81,7 @@ namespace LuanYu_ArtisanBeer
         private void AddShopWorkersToTownCenter(Dictionary<string, int> unusedUsablePointCount)
         {
             Settlement settlement = PlayerEncounter.LocationEncounter.Settlement;
-            CharacterObject shopWorker = settlement.Culture.CaravanMaster;
+            CharacterObject shopWorker = _artisanBbrewer;
 
             Monster monsterWithSuffix = TaleWorlds.Core.FaceGen.GetMonsterWithSuffix(shopWorker.Race, "_settlement");
             Location locationWithId = Settlement.CurrentSettlement.LocationComplex.GetLocationWithId("center");

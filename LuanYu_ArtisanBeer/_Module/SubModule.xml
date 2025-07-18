@@ -44,6 +44,15 @@
 				<GameType value="CustomGame" />
 				<GameType value="EditorGame" />
 			</IncludedGameTypes>
-		</XmlNode>             
+		</XmlNode>       
+		<XmlNode>                
+			<XmlName id="NPCCharacters" path="artisan_beer_charcaters" />
+			<IncludedGameTypes>
+				<GameType value="Campaign" />
+				<GameType value="CampaignStoryMode" />
+				<GameType value="CustomGame" />
+				<GameType value="EditorGame" />
+			</IncludedGameTypes>
+		</XmlNode>  		
 	</Xmls>
 </Module>
