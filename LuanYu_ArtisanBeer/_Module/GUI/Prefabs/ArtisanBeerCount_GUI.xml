@@ -1,0 +1,11 @@
+<Prefab>
+	<Constants>
+		
+		</Constants>
+	<VisualDefinitions>
+	</VisualDefinitions>
+	<Window>
+	
+	<TextWidget IsVisible ="@IsVisible" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" IntText="@ArtisanBeerCount"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
+</Window>
+</Prefab>
