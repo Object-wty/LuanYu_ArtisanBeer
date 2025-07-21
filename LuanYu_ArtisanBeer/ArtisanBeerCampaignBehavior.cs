@@ -2,15 +2,21 @@
 using SandBox.Conversation;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.AgentOrigins;
+using TaleWorlds.CampaignSystem.CampaignBehaviors;
 using TaleWorlds.CampaignSystem.Conversation;
 using TaleWorlds.CampaignSystem.Encounters;
+using TaleWorlds.CampaignSystem.GameMenus;
+using TaleWorlds.CampaignSystem.Overlay;
 using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.Settlements.Locations;
 using TaleWorlds.CampaignSystem.Settlements.Workshops;
+using TaleWorlds.CampaignSystem.ViewModelCollection;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
@@ -22,7 +28,7 @@ namespace LuanYu_ArtisanBeer
 {
     public class ArtisanBeerCampaignBehavior : CampaignBehaviorBase
     {
-        private CharacterObject _artisanBbrewer;
+        private CharacterObject _artisanBrewer;
         private ItemObject _artisanBeerObject;
 
         public override void RegisterEvents()
@@ -34,18 +40,90 @@ namespace LuanYu_ArtisanBeer
 
         private void OnSessionLaunched(CampaignGameStarter starter)
         {
-            _artisanBbrewer = MBObjectManager.Instance.GetObject<CharacterObject>("artisan_brewer");
+            _artisanBrewer = MBObjectManager.Instance.GetObject<CharacterObject>("artisan_brewer");
             _artisanBeerObject = MBObjectManager.Instance.GetObject<ItemObject>("artisan_beer");
             this.AddArtisanWokerDialogs(starter);
+            this.AddGameMenus(starter);
+        }
+
+        private void AddGameMenus(CampaignGameStarter starter)
+        {
+            for (int i=0;i<5;i++)
+            {
+                AddBrewery(starter, i);
+
+            }
+            starter.AddGameMenu("brewer_workshop", "精酿啤酒厂", (MenuCallbackArgs args) => { }, GameOverlays.MenuOverlayType.SettlementWithBoth, GameMenu.MenuFlags.None, null);
+
+            starter.AddGameMenuOption("brewer_workshop", "brewer_workshop_take_artisan_beer", "进入仓库", (MenuCallbackArgs args) =>
+            {
+                args.optionLeaveType = GameMenuOption.LeaveType.Trade;
+                return true;
+            }, delegate (MenuCallbackArgs x)
+            {
+                //实现快速拿取仓库里的精酿啤酒,到我们的背包里
+                List<InquiryElement> list = new List<InquiryElement>();
+                ArtisanBeerWorkShopState artisanBeerWorkShopState = GetArtisanBeerWorkShopState(_selectWorkshop);
+                for(int i = 0; i < artisanBeerWorkShopState._currentStock; i++)
+                {
+                    list.Add(new InquiryElement(_artisanBeerObject, _artisanBeerObject.Name.ToString(), new ImageIdentifier(_artisanBeerObject)));
+
+                }
+                
+                MBInformationManager.ShowMultiSelectionInquiry(
+                    new MultiSelectionInquiryData(new TextObject("精酿啤酒仓库", null).ToString(), 
+                    string.Empty, list, true, 1, 0, new TextObject("拿取", null).ToString(), 
+                    new TextObject("{=3CpNUnVl}Cancel", null).ToString(), new Action<List<InquiryElement>>(this.QuickTakeArtisanBeer),
+                    new Action<List<InquiryElement>>(this.QuickTakeArtisanBeer), "", false), false, false);
+            }, true, -1, false, null);
+
+            starter.AddGameMenuOption("brewer_workshop", "brewer_workshop_back_to_center", "{=qWAmxyYz}Back to town center", (MenuCallbackArgs args) =>
+            {
+                args.optionLeaveType = GameMenuOption.LeaveType.Leave;
+                return true;
+            }, delegate (MenuCallbackArgs x)
+            {
+                GameMenu.SwitchToMenu("town");
+            }, true, -1, false, null);
+        }
+
+        private void QuickTakeArtisanBeer(List<InquiryElement> list)
+        {
+            ArtisanBeerWorkShopState artisanBeerWorkShopState = GetArtisanBeerWorkShopState(_selectWorkshop);
+            artisanBeerWorkShopState.AddStock(-list.Count);
+            TaleWorlds.CampaignSystem.Roster.ItemRoster itemRoster = MobileParty.MainParty.ItemRoster;
+
+            itemRoster.AddToCounts(_artisanBeerObject, list.Count);
+        }
+
+        private void AddBrewery(CampaignGameStarter starter, int i)
+        {
+            starter.AddGameMenuOption("town", "brewer_workshop_go_to_brewery", "去啤酒厂", (MenuCallbackArgs args) =>
+            {
+                if (i >= Settlement.CurrentSettlement.Town.Workshops.Length)
+                    return false;
+                //城镇中有啤酒厂,且啤酒厂属于主角
+                if (Settlement.CurrentSettlement.Town.Workshops[i].Owner == Hero.MainHero
+                && Settlement.CurrentSettlement.Town.Workshops[i].WorkshopType.StringId == "brewery")
+                {
+                    args.optionLeaveType = GameMenuOption.LeaveType.Manage;
+                    return true;
+                }
+                    return false;
+            }, delegate (MenuCallbackArgs x)
+            {
+                _selectWorkshop = Settlement.CurrentSettlement.Town.Workshops[i];
+                GameMenu.SwitchToMenu("brewer_workshop");
+            }, true, -1, false, null);
         }
 
         private void AddArtisanWokerDialogs(CampaignGameStarter campaignGameStarter)
         {
             campaignGameStarter.AddDialogLine("artisanbeer_owner_begin", "start", "end", "嘿，兄弟,没货了,过会再来!",
-          () => CharacterObject.OneToOneConversationCharacter == _artisanBbrewer && GetCurrentArtisanBeerWorkshopStateStock()<=0, null, 100, null);
+          () => CharacterObject.OneToOneConversationCharacter == _artisanBrewer && GetCurrentArtisanBeerWorkshopStateStock()<=0, null, 100, null);
 
             campaignGameStarter.AddDialogLine("artisanbeer_owner_begin", "start", "artisanbeer_npc_player", "嘿，朋友！想来点特别的吗？我们这有上等的精酿啤酒，200第纳尔一杯。要尝尝吗？",
-            () => CharacterObject.OneToOneConversationCharacter == _artisanBbrewer, null, 100, null);
+            () => CharacterObject.OneToOneConversationCharacter == _artisanBrewer, null, 100, null);
             campaignGameStarter.AddPlayerLine("artisanbeer_buy_one", "artisanbeer_npc_player", "artisanbeer_player_buy", "当然，给我来一杯", null,
             () =>
             {
@@ -87,7 +165,7 @@ namespace LuanYu_ArtisanBeer
         private void AddShopWorkersToTownCenter(Dictionary<string, int> unusedUsablePointCount)
         {
             Settlement settlement = PlayerEncounter.LocationEncounter.Settlement;
-            CharacterObject shopWorker = _artisanBbrewer;
+            CharacterObject shopWorker = _artisanBrewer;
 
             Monster monsterWithSuffix = TaleWorlds.Core.FaceGen.GetMonsterWithSuffix(shopWorker.Race, "_settlement");
             Location locationWithId = Settlement.CurrentSettlement.LocationComplex.GetLocationWithId("center");
@@ -149,6 +227,8 @@ namespace LuanYu_ArtisanBeer
         }
 
         public Dictionary<string, ArtisanBeerWorkShopState> _artisanBeerWorkShopState = new Dictionary<string, ArtisanBeerWorkShopState>();
+        private Workshop _selectWorkshop;
+
         public override void SyncData(IDataStore dataStore)
         {
             dataStore.SyncData("_artisanBeerWorkShopState", ref _artisanBeerWorkShopState);
