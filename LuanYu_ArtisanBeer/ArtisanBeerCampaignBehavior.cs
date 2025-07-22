@@ -10,6 +10,7 @@ using TaleWorlds.CampaignSystem.CampaignBehaviors;
 using TaleWorlds.CampaignSystem.Conversation;
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.GameMenus;
+using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.Overlay;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Roster;
@@ -45,7 +46,7 @@ namespace LuanYu_ArtisanBeer
             this.AddArtisanWokerDialogs(starter);
             this.AddGameMenus(starter);
         }
-
+        
         private void AddGameMenus(CampaignGameStarter starter)
         {
             for (int i=0;i<5;i++)
@@ -75,6 +76,17 @@ namespace LuanYu_ArtisanBeer
                     string.Empty, list, true, 1, 0, new TextObject("拿取", null).ToString(), 
                     new TextObject("{=3CpNUnVl}Cancel", null).ToString(), new Action<List<InquiryElement>>(this.QuickTakeArtisanBeer),
                     new Action<List<InquiryElement>>(this.QuickTakeArtisanBeer), "", false), false, false);
+            }, true, -1, false, null);
+
+            starter.AddGameMenuOption("brewer_workshop", "brewer_workshop_go_to_managment", "生产管理", (MenuCallbackArgs args) =>
+            {
+                args.optionLeaveType = GameMenuOption.LeaveType.ManageGarrison;
+                return true;
+            }, delegate (MenuCallbackArgs x)
+            {
+                ArtisanBeerManagmentState gameState = Game.Current.GameStateManager.CreateState<ArtisanBeerManagmentState>(_selectWorkshop,GetArtisanBeerWorkShopState(_selectWorkshop));
+                Game.Current.GameStateManager.PushState(gameState, 0);
+                
             }, true, -1, false, null);
 
             starter.AddGameMenuOption("brewer_workshop", "brewer_workshop_back_to_center", "{=qWAmxyYz}Back to town center", (MenuCallbackArgs args) =>

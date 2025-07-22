@@ -1,0 +1,64 @@
+﻿<Prefab>
+  <Parameters>
+    
+  </Parameters>
+  <Constants>
+    
+  </Constants>
+  <Variables>
+  </Variables>
+  <VisualDefinitions>
+    <VisualDefinition Name="BottomMenu" EaseIn="true" TransitionDuration="0.45">
+      <VisualState PositionYOffset="6" State="Default" />
+    </VisualDefinition>
+  </VisualDefinitions>
+  <Window>
+    <Widget  WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent">
+      <Children>
+
+        <Standard.Window Parameter.Title="生产管理">
+          <Children >
+            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" PositionYOffset="80" VerticalAlignment="Top"  StackLayout.LayoutMethod="VerticalBottomToTop" >
+                <Children>
+                  <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="生产管理" PositionXOffset="100"  />
+                 <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Center"  StackLayout.LayoutMethod="HorizontalLeftToRight">
+                  <Children>
+
+                    <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" IntText="@ProctionAmount" PositionXOffset="-50" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <SliderWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="338" SuggestedHeight="42" VerticalAlignment="Center" Filler="Filler" Handle="SliderHandle" Locked="false" MaxValueInt="5" MinValueInt="1" ValueInt="@ProctionAmount" IsDisabled="false" DoNotPassEventsToChildren="true" UpdateChildrenStates="true" IsDiscrete="true" DoNotUpdateHandleSize="true">
+                      <Children>
+                        <ImageWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="362" SuggestedHeight="38" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="CustomBattle.Slider.Canvas"/>
+                        <ImageWidget Id="Filler" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="345" SuggestedHeight="35" VerticalAlignment="Center" Brush="CustomBattle.Slider.Fill" ClipContents="true" UpdateChildrenStates="true">
+                          <Children>
+                            <ImageWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="345" SuggestedHeight="35" HorizontalAlignment="Left" VerticalAlignment="Center" Brush="CustomBattle.Slider.Fill"/>
+                          </Children>
+                        </ImageWidget>
+                        <ImageWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="400" SuggestedHeight="65" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="CustomBattle.Slider.Frame"/>
+                        <ImageWidget Id="SliderHandle" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="14" SuggestedHeight="38" HorizontalAlignment="Left" VerticalAlignment="Center" Brush="CustomBattle.Slider.Handle" DoNotAcceptEvents="true" GamepadNavigationIndex="0"/>
+                      </Children>
+                    </SliderWidget>
+                    <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="@ProdctionRatio"   PositionXOffset="50" />
+                  </Children>
+                
+                 </ListPanel>
+                 <ListPannl WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"  StackLayout.LayoutMethod="HorizontalLeftToRight">
+                  <Children>
+                    <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="精酿啤酒" PositionXOffset="-50"   />
+                    <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Text="普通啤酒"  PositionXOffset="400"   />
+                  </Children>
+                </ListPannl>
+                </Children>
+            </ListPanel>
+
+             <!--Close Screen Button-->
+        <Standard.DialogCloseButtons VisualDefinition="BottomMenu" HorizontalAlignment="Center" VerticalAlignment="Bottom" PositionYOffset="100" Parameter.DoneButtonAction="ExecuteDone" Parameter.DoneButtonText="Done" Parameter.ShowCancel="true"  Parameter.CancelButtonAction="ExecuteCancel"  Parameter.CancelButtonText="Cancel"/>
+
+          </Children>
+        </Standard.Window>
+
+        
+       
+      </Children>
+    </Widget>
+  </Window>
+</Prefab>
