@@ -32,11 +32,27 @@ namespace LuanYu_ArtisanBeer
         private CharacterObject _artisanBrewer;
         private ItemObject _artisanBeerObject;
 
+
+        public ArtisanBeerCampaignBehavior()
+        {
+            _instance = this;
+        }
         public override void RegisterEvents()
         {
             CampaignEvents.DailyTickTownEvent.AddNonSerializedListener(this, OnDailyTickTown);
             CampaignEvents.LocationCharactersAreReadyToSpawnEvent.AddNonSerializedListener(this, new Action<Dictionary<string, int>>(this.LocationCharactersAreReadyToSpawn));
             CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener(this, new Action<CampaignGameStarter>(this.OnSessionLaunched));
+            CampaignEvents.OnItemProducedEvent.AddNonSerializedListener(this, OnItemProduced);
+        }
+
+        private void OnItemProduced(ItemObject item, Settlement settlement, int arg3)
+        {
+            if (item.StringId =="beer")
+            {
+                InformationManager.DisplayMessage(new InformationMessage(settlement.Town.Name.ToString() + "生产了 beer"));
+            }
+
+            
         }
 
         private void OnSessionLaunched(CampaignGameStarter starter)
@@ -216,6 +232,22 @@ namespace LuanYu_ArtisanBeer
 
                 }
 
+            }
+        }
+
+        static ArtisanBeerCampaignBehavior  _instance;
+        public static float GetNormalBeerEff(Workshop workshop)
+        {
+            if (workshop.WorkshopType.StringId == "brewery")
+            {
+
+                ArtisanBeerWorkShopState artisanBeerWorkShopState = _instance.GetArtisanBeerWorkShopState(workshop);
+                float value = (5- artisanBeerWorkShopState._dailyProctionAmount)/5.0f;
+                return value;
+            }
+            else
+            {
+                return 1;
             }
         }
 

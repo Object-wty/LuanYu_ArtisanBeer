@@ -1,4 +1,5 @@
-﻿using TaleWorlds.CampaignSystem;
+﻿using HarmonyLib;
+using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
 
@@ -11,6 +12,8 @@ namespace LuanYu_ArtisanBeer
         {
             base.OnSubModuleLoad();
 
+            var harmony = new Harmony("LuanYu_ArtisanBeer");
+            harmony.PatchAll();
         }
 
         protected override void OnSubModuleUnloaded()
